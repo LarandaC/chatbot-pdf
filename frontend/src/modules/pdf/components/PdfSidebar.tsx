@@ -1,6 +1,6 @@
 "use client"
 import { HugeiconsIcon } from "@hugeicons/react"
-import { PdfIcon, PlusSignIcon } from "@hugeicons/core-free-icons"
+import { PdfIcon, PlusSignIcon, Layers01Icon } from "@hugeicons/core-free-icons"
 import {
   Sidebar,
   SidebarContent,
@@ -26,6 +26,7 @@ interface Props {
   activeChatId: string | null
   onNewConversation: () => void
   onNewChat: (pdf: PdfEntry) => void
+  onNewAllDocsChat: () => void
   onSelectChat: (chat: Chat) => void
   onDeleteChat: (chatId: string) => void
   onUploaded: (entry: PdfEntry) => void
@@ -37,6 +38,7 @@ export function PdfSidebar({
   activeChatId,
   onNewConversation,
   onNewChat,
+  onNewAllDocsChat,
   onSelectChat,
   onDeleteChat,
   onUploaded,
@@ -84,6 +86,12 @@ export function PdfSidebar({
           <SidebarGroupLabel>PDFs cargados</SidebarGroupLabel>
           {pdfs.length > 0 && (
             <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton onClick={onNewAllDocsChat} className="cursor-pointer">
+                  <HugeiconsIcon icon={Layers01Icon} strokeWidth={1.5} className="shrink-0" />
+                  <span className="truncate">Chatear con todos los documentos</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
               {pdfs.map((pdf) => (
                 <SidebarMenuItem key={pdf.collection}>
                   <SidebarMenuButton onClick={() => onNewChat(pdf)} className="cursor-pointer">

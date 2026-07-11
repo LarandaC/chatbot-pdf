@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routes import ask, debug, health, search, upload
+from app.api.routes import ask, debug, documents, health, search, upload
 from app.core.config import get_settings
 
 settings = get_settings()
@@ -27,3 +27,4 @@ app.include_router(upload.router)
 app.include_router(search.router)
 app.include_router(ask.router)
 app.include_router(debug.router)
+app.include_router(documents.router)

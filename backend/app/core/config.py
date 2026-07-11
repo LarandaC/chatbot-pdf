@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     groq_model: str = "llama-3.3-70b-versatile"
     cors_origins: list[str] = ["http://localhost:3000"]
     chroma_path: str = str(BASE_DIR / "chroma_db")
+    chroma_collection: str = "documents"
     embedding_model: str = "paraphrase-multilingual-MiniLM-L12-v2"
 
 

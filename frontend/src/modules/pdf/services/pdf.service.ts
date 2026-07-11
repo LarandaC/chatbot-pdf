@@ -1,5 +1,6 @@
 import { API_URL } from "@/lib/config";
-import { UploadResponse } from "../types/pdf.types";
+import { apiClient } from "@/lib/api-client";
+import { DocumentsResponse, UploadResponse } from "../types/pdf.types";
 
 
 export async function uploadPdf(file: File): Promise<UploadResponse> {
@@ -20,4 +21,8 @@ export async function uploadPdf(file: File): Promise<UploadResponse> {
   }
 
   return res.json();
+}
+
+export async function listDocuments(): Promise<DocumentsResponse> {
+  return apiClient<DocumentsResponse>("/documents");
 }
