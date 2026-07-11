@@ -40,7 +40,7 @@ export function ChatWindow({ chat, onMessagesChange }: Props) {
   return (
     <div className="flex flex-col flex-1 min-h-0">
       <ScrollArea className="flex-1 px-6 py-4">
-        <div className="flex flex-col gap-4 max-w-3xl mx-auto">
+        <div className="flex w-full flex-col gap-4">
           {chat.messages.length === 0 && (
             <Empty className="mt-8">
               <EmptyMedia variant="icon">
@@ -69,19 +69,17 @@ export function ChatWindow({ chat, onMessagesChange }: Props) {
       </ScrollArea>
 
       <div className="sticky bottom-0 px-6 py-3 bg-background shrink-0">
-        <div className="max-w-3xl mx-auto">
-          <ChatInput
-            value={input}
-            onChange={setInput}
-            onSend={handleSend}
-            disabled={isPending}
-            placeholder={
-              chat.pdfCollection === null
-                ? "Preguntá sobre tus documentos..."
-                : `Preguntá sobre "${chat.pdfName}"...`
-            }
-          />
-        </div>
+        <ChatInput
+          value={input}
+          onChange={setInput}
+          onSend={handleSend}
+          disabled={isPending}
+          placeholder={
+            chat.pdfCollection === null
+              ? "Preguntá sobre tus documentos..."
+              : `Preguntá sobre "${chat.pdfName}"...`
+          }
+        />
       </div>
     </div>
   )
