@@ -26,3 +26,7 @@ export async function uploadPdf(file: File): Promise<UploadResponse> {
 export async function listDocuments(): Promise<DocumentsResponse> {
   return apiClient<DocumentsResponse>("/documents");
 }
+
+export async function deleteDocument(source: string): Promise<void> {
+  await apiClient(`/documents/${encodeURIComponent(source)}`, { method: "DELETE" });
+}

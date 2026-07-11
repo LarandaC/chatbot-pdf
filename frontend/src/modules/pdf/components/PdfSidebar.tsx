@@ -1,6 +1,6 @@
 "use client"
 import { HugeiconsIcon } from "@hugeicons/react"
-import { PdfIcon, PlusSignIcon, Layers01Icon } from "@hugeicons/core-free-icons"
+import { PlusSignIcon, Layers01Icon, FolderLibraryIcon } from "@hugeicons/core-free-icons"
 import {
   Sidebar,
   SidebarContent,
@@ -18,18 +18,16 @@ import { groupByDate } from "../../chat/utils/chat.utils"
 import { ChatSidebarItem } from "../../chat/components/ChatSidebarItem"
 import { Chat } from "../../chat/types/chat.types"
 import { PdfEntry } from "../types/pdf.types"
-import { UploadZone } from "./UploadedZone"
 
 interface Props {
   pdfs: PdfEntry[]
   chats: Chat[]
   activeChatId: string | null
   onNewConversation: () => void
-  onNewChat: (pdf: PdfEntry) => void
   onNewAllDocsChat: () => void
+  onOpenDocuments: () => void
   onSelectChat: (chat: Chat) => void
   onDeleteChat: (chatId: string) => void
-  onUploaded: (entry: PdfEntry) => void
 }
 
 export function PdfSidebar({
@@ -37,13 +35,13 @@ export function PdfSidebar({
   chats,
   activeChatId,
   onNewConversation,
-  onNewChat,
   onNewAllDocsChat,
+  onOpenDocuments,
   onSelectChat,
   onDeleteChat,
-  onUploaded,
 }: Props) {
   const groups = groupByDate(chats)
+  const hasPdfs = pdfs.length > 0
 
   return (
     <Sidebar>
@@ -59,6 +57,27 @@ export function PdfSidebar({
           <HugeiconsIcon icon={PlusSignIcon} strokeWidth={2} />
           Nueva conversación
         </Button>
+
+        <div className="flex flex-col gap-1.5">
+          <Button
+            variant="secondary"
+            className="h-auto w-full items-start justify-start gap-2 py-2 text-left whitespace-normal"
+            onClick={onNewAllDocsChat}
+            disabled={!hasPdfs}
+            title={hasPdfs ? undefined : "Subí un PDF primero"}
+          >
+            <HugeiconsIcon icon={Layers01Icon} strokeWidth={1.5} className="mt-0.5 shrink-0" />
+            <span>Chatear con todos los documentos</span>
+          </Button>
+          <Button
+            variant="secondary"
+            className="h-auto w-full items-start justify-start gap-2 py-2 text-left whitespace-normal"
+            onClick={onOpenDocuments}
+          >
+            <HugeiconsIcon icon={FolderLibraryIcon} strokeWidth={1.5} className="mt-0.5 shrink-0" />
+            <span>Nueva conversación a partir de un documento</span>
+          </Button>
+        </div>
       </SidebarHeader>
 
       <SidebarContent>
@@ -83,33 +102,18 @@ export function PdfSidebar({
       <SidebarFooter className="p-0">
         <SidebarSeparator />
         <SidebarGroup>
-          <SidebarGroupLabel>PDFs cargados</SidebarGroupLabel>
-          {pdfs.length > 0 && (
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton onClick={onNewAllDocsChat} className="cursor-pointer">
-                  <HugeiconsIcon icon={Layers01Icon} strokeWidth={1.5} className="shrink-0" />
-                  <span className="truncate">Chatear con todos los documentos</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              {pdfs.map((pdf) => (
-                <SidebarMenuItem key={pdf.collection}>
-                  <SidebarMenuButton onClick={() => onNewChat(pdf)} className="cursor-pointer">
-                    <HugeiconsIcon icon={PdfIcon} strokeWidth={1.5} className="shrink-0" />
-                    <span className="truncate">{pdf.name}</span>
-                    {pdf.pages && (
-                      <span className="ml-auto text-sidebar-foreground/40 shrink-0 tabular-nums">
-                        {pdf.pages}p
-                      </span>
-                    )}
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          )}
-          <div className="px-2 mt-1 pb-2">
-            <UploadZone onUploaded={onUploaded} />
-          </div>
+          <SidebarGroupLabel>Biblioteca</SidebarGroupLabel>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton onClick={onOpenDocuments} className="cursor-pointer">
+                <HugeiconsIcon icon={FolderLibraryIcon} strokeWidth={1.5} className="shrink-0" />
+                <span className="truncate">Gestionar documentos</span>
+                <span className="ml-auto text-sidebar-foreground/40 shrink-0 tabular-nums">
+                  {pdfs.length}
+                </span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
         </SidebarGroup>
       </SidebarFooter>
     </Sidebar>

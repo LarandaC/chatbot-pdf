@@ -1,5 +1,5 @@
 "use client"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useLocalStorage } from "@/src/hooks/use-local-storage"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { AiChat01Icon } from "@hugeicons/core-free-icons"
@@ -9,12 +9,14 @@ import { PdfEntry } from "../modules/pdf/types/pdf.types"
 import { listDocuments } from "../modules/pdf/services/pdf.service"
 import { Chat, Message } from "../modules/chat/types/chat.types"
 import { PdfSidebar } from "../modules/pdf/components/PdfSidebar"
+import { DocumentsPanel } from "../modules/pdf/components/DocumentsPanel"
 import { ChatWindow } from "../modules/chat/components/ChatWindow"
 
 export default function Home() {
   const [pdfs, setPdfs] = useLocalStorage<PdfEntry[]>("chat-pdf:pdfs", [])
   const [chats, setChats] = useLocalStorage<Chat[]>("chat-pdf:chats", [])
   const [activeChatId, setActiveChatId] = useLocalStorage<string | null>("chat-pdf:active-chat", null)
+  const [documentsOpen, setDocumentsOpen] = useState(false)
 
   const activeChat = chats.find((c) => c.id === activeChatId) ?? null
 
@@ -73,6 +75,15 @@ export default function Home() {
     if (activeChatId === chatId) setActiveChatId(null)
   }
 
+  function handleDocumentDeleted(collection: string) {
+    setPdfs((prev) => prev.filter((p) => p.collection !== collection))
+  }
+
+  function handleSelectFromPanel(pdf: PdfEntry) {
+    createChat(pdf)
+    setDocumentsOpen(false)
+  }
+
   function handleMessagesChange(chatId: string, messages: Message[]) {
     setChats((prev) =>
       prev.map((c) => {
@@ -94,11 +105,18 @@ export default function Home() {
         chats={chats}
         activeChatId={activeChatId}
         onNewConversation={() => setActiveChatId(null)}
-        onNewChat={createChat}
         onNewAllDocsChat={createAllDocsChat}
+        onOpenDocuments={() => setDocumentsOpen(true)}
         onSelectChat={(chat) => setActiveChatId(chat.id)}
         onDeleteChat={handleDeleteChat}
+      />
+      <DocumentsPanel
+        open={documentsOpen}
+        onOpenChange={setDocumentsOpen}
+        pdfs={pdfs}
         onUploaded={handleUploaded}
+        onSelect={handleSelectFromPanel}
+        onDeleted={handleDocumentDeleted}
       />
       <SidebarInset className="flex flex-col overflow-hidden">
         <header className="flex items-center gap-2 px-4 h-12 border-b shrink-0">
@@ -129,7 +147,8 @@ export default function Home() {
             <EmptyHeader>
               <EmptyTitle>Empezá una conversación</EmptyTitle>
               <EmptyDescription>
-                Subí un PDF o hacé clic en un documento de la barra lateral para chatear
+                Elegí &quot;Chatear con todos los documentos&quot; o abrí tu biblioteca
+                para chatear con un PDF puntual
               </EmptyDescription>
             </EmptyHeader>
           </Empty>
