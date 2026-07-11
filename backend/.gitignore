@@ -1,0 +1,17 @@
+# entorno virtual
+venv/
+
+# variables de entorno
+.env
+
+# bytecode
+__pycache__/
+*.pyc
+*.pyo
+
+# base de datos vectorial (datos indexados localmente)
+chroma_db/
+
+# archivos temporales
+*.tmp
+*.log
