@@ -14,6 +14,7 @@ import {
   SidebarSeparator,
 } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
+import { ThemeToggle } from "@/components/shared/ThemeToggle"
 import { groupByDate } from "../../chat/utils/chat.utils"
 import { ChatSidebarItem } from "../../chat/components/ChatSidebarItem"
 import { Chat } from "../../chat/types/chat.types"
@@ -46,9 +47,10 @@ export function PdfSidebar({
   return (
     <Sidebar>
       <SidebarHeader className="gap-2 pb-3">
-        <p className="px-2 text-[0.625rem] font-semibold text-sidebar-foreground/40 uppercase tracking-widest">
-          Chat PDF
-        </p>
+        <div className="flex items-center justify-between px-1 pb-1">
+          <p className="text-sm font-semibold text-sidebar-foreground">Chat PDF</p>
+          <ThemeToggle className="text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground" />
+        </div>
         <Button
           variant="outline"
           className="w-full justify-start gap-2 border-sidebar-border bg-transparent text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
