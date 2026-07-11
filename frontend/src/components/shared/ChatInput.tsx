@@ -1,7 +1,7 @@
 "use client"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { ArrowUp01Icon } from "@hugeicons/core-free-icons"
 import { cn } from "@/lib/utils"
@@ -31,30 +31,25 @@ export function ChatInput({
   }
 
   return (
-    <div className={cn("relative", className)}>
-      <Textarea
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        onKeyDown={handleKeyDown}
-        placeholder={placeholder}
-        disabled={disabled}
-        className="min-h-20 max-h-60 pr-12 pb-10 resize-none"
-      />
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              size="icon-sm"
-              onClick={onSend}
-              disabled={!value.trim() || disabled}
-              className="absolute right-2 bottom-2"
-            >
-              <HugeiconsIcon icon={ArrowUp01Icon} strokeWidth={2} />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="top">Enviar (Enter)</TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+    <div className={cn("shrink-0 border-t border-border bg-background px-6 py-3", className)}>
+      <div className="relative">
+        <Textarea
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder={placeholder}
+          disabled={disabled}
+          className="min-h-20 max-h-60 pr-12 pb-10 resize-none bg-card border border-border focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+        />
+        <Button
+          size="icon-sm"
+          onClick={onSend}
+          disabled={!value.trim() || disabled}
+          className="absolute right-2 bottom-2"
+        >
+          <HugeiconsIcon icon={ArrowUp01Icon} strokeWidth={2} />
+        </Button>
+      </div>
     </div>
   )
 }

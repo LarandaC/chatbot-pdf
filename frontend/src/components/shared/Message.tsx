@@ -1,5 +1,5 @@
 import { HugeiconsIcon } from "@hugeicons/react"
-import { AiChat01Icon, UserIcon } from "@hugeicons/core-free-icons"
+import { BotIcon, UserIcon } from "@hugeicons/core-free-icons"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Bubble, BubbleContent } from "@/components/ui/bubble"
 import { Message, MessageAvatar, MessageContent, MessageFooter } from "@/components/ui/message"
@@ -14,7 +14,7 @@ function renderWithCitations(text: string): React.ReactNode {
       return (
         <span
           key={i}
-          className="inline-flex items-center justify-center w-[1.1em] h-[1.1em] rounded-full bg-primary/12 text-primary text-[0.55rem] font-bold mx-0.5 align-middle leading-none"
+          className="inline-flex items-center justify-center w-3 h-3 rounded-full bg-primary/12 text-primary text-[0.55rem] font-bold mx-0.5 align-middle leading-none"
         >
           {match[1]}
         </span>
@@ -28,28 +28,28 @@ export function MessageBubble({ message }: { message: MessageType }) {
   if (message.role === "user") {
     return (
       <Message align="end">
+        <MessageAvatar className="self-start">
+          <Avatar size="sm">
+            <AvatarFallback className="bg-primary text-primary-foreground">
+              <HugeiconsIcon icon={UserIcon} strokeWidth={1.5} className="size-3.5" />
+            </AvatarFallback>
+          </Avatar>
+        </MessageAvatar>
         <MessageContent>
           <Bubble variant="default" align="end">
             <BubbleContent className="text-sm px-4 py-3">{message.content}</BubbleContent>
           </Bubble>
         </MessageContent>
-        <MessageAvatar>
-          <Avatar size="sm">
-            <AvatarFallback>
-              <HugeiconsIcon icon={UserIcon} strokeWidth={1.5} className="size-3.5" />
-            </AvatarFallback>
-          </Avatar>
-        </MessageAvatar>
       </Message>
     )
   }
 
   return (
     <Message align="start">
-      <MessageAvatar>
+      <MessageAvatar className="self-start group-has-data-[slot=message-footer]/message:translate-y-0">
         <Avatar size="sm">
-          <AvatarFallback>
-            <HugeiconsIcon icon={AiChat01Icon} strokeWidth={1.5} className="size-3.5" />
+          <AvatarFallback className="bg-muted text-primary">
+            <HugeiconsIcon icon={BotIcon} strokeWidth={1.5} className="size-3.5" />
           </AvatarFallback>
         </Avatar>
       </MessageAvatar>

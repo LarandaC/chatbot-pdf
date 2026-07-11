@@ -2,7 +2,6 @@
 import { useEffect, useRef, useState } from "react"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { BubbleChatIcon } from "@hugeicons/core-free-icons"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { Spinner } from "@/components/ui/spinner"
 import { Empty, EmptyHeader, EmptyTitle, EmptyDescription, EmptyMedia } from "@/components/ui/empty"
 import { Chat, Message } from "../types/chat.types"
@@ -39,7 +38,7 @@ export function ChatWindow({ chat, onMessagesChange }: Props) {
 
   return (
     <div className="flex flex-col flex-1 min-h-0">
-      <ScrollArea className="flex-1 px-6 py-4">
+      <div className="flex-1 overflow-y-auto min-h-0 px-6 py-4">
         <div className="flex w-full flex-col gap-4">
           {chat.messages.length === 0 && (
             <Empty className="mt-8">
@@ -66,21 +65,19 @@ export function ChatWindow({ chat, onMessagesChange }: Props) {
           )}
           <div ref={bottomRef} />
         </div>
-      </ScrollArea>
-
-      <div className="sticky bottom-0 px-6 py-3 bg-background shrink-0">
-        <ChatInput
-          value={input}
-          onChange={setInput}
-          onSend={handleSend}
-          disabled={isPending}
-          placeholder={
-            chat.pdfCollection === null
-              ? "Preguntá sobre tus documentos..."
-              : `Preguntá sobre "${chat.pdfName}"...`
-          }
-        />
       </div>
+
+      <ChatInput
+        value={input}
+        onChange={setInput}
+        onSend={handleSend}
+        disabled={isPending}
+        placeholder={
+          chat.pdfCollection === null
+            ? "Preguntá sobre tus documentos..."
+            : `Preguntá sobre "${chat.pdfName}"...`
+        }
+      />
     </div>
   )
 }

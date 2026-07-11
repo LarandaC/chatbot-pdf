@@ -53,7 +53,7 @@ export function PdfSidebar({
         </div>
         <Button
           variant="outline"
-          className="w-full justify-start gap-2 border-sidebar-border bg-transparent text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+          className="w-full justify-start gap-2 border-sidebar-border bg-sidebar-accent/50 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
           onClick={onNewConversation}
         >
           <HugeiconsIcon icon={PlusSignIcon} strokeWidth={2} />
@@ -63,7 +63,7 @@ export function PdfSidebar({
         <div className="flex flex-col gap-1.5">
           <Button
             variant="secondary"
-            className="h-auto w-full items-start justify-start gap-2 py-2 text-left whitespace-normal"
+            className="h-auto w-full items-start justify-start gap-2 py-2 text-left whitespace-normal bg-sidebar-accent text-sidebar-accent-foreground hover:bg-[color-mix(in_oklch,var(--sidebar-accent),var(--sidebar-foreground)_8%)]"
             onClick={onNewAllDocsChat}
             disabled={!hasPdfs}
             title={hasPdfs ? undefined : "Subí un PDF primero"}
@@ -73,7 +73,7 @@ export function PdfSidebar({
           </Button>
           <Button
             variant="secondary"
-            className="h-auto w-full items-start justify-start gap-2 py-2 text-left whitespace-normal"
+            className="h-auto w-full items-start justify-start gap-2 py-2 text-left whitespace-normal bg-sidebar-accent text-sidebar-accent-foreground hover:bg-[color-mix(in_oklch,var(--sidebar-accent),var(--sidebar-foreground)_8%)]"
             onClick={onOpenDocuments}
           >
             <HugeiconsIcon icon={FolderLibraryIcon} strokeWidth={1.5} className="mt-0.5 shrink-0" />
