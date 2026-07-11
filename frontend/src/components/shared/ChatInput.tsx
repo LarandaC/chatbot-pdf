@@ -1,7 +1,6 @@
 "use client"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { ArrowUp01Icon } from "@hugeicons/core-free-icons"
 import { cn } from "@/lib/utils"
