@@ -1,5 +1,7 @@
 export interface Source {
   citation: string;
+  source?: string;
+  source_name?: string;
   page: number;
   score: number;
   excerpt: string;
@@ -21,13 +23,14 @@ export interface AskResponse {
 
 export interface AskRequest {
   question: string;
-  collection: string;
+  collection?: string | null;
   n_results?: number;
 }
 
 export interface Chat {
   id: string;
-  pdfCollection: string;
+  // null = chat sobre todos los documentos cargados
+  pdfCollection: string | null;
   pdfName: string;
   title: string;
   messages: Message[];

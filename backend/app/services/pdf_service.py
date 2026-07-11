@@ -7,7 +7,7 @@ from fastapi import UploadFile
 from app.integrations.embedder import embed_texts
 from app.processing.chunker import chunks_pages
 from app.processing.pdf_processor import extract_text_by_page
-from app.repositories.vector_store import add_chunks, collection_exists_and_has_data
+from app.repositories.vector_store import add_chunks, document_exists
 from app.utils.naming import filename_to_collection
 
 
@@ -32,12 +32,13 @@ def index_pdf(file: UploadFile) -> dict:
     y lo indexa. Si ya fue indexado antes, no lo vuelve a procesar.
     Lanza ValueError si no se pudo extraer texto del PDF.
     """
-    collection_name = filename_to_collection(file.filename)
+    source = filename_to_collection(file.filename)
+    source_name = file.filename
 
-    if collection_exists_and_has_data(collection_name):
+    if document_exists(source):
         return {
             "status": "already_indexed",
-            "collection": collection_name,
+            "collection": source,
             "message": "Este pdf ya fue indexado",
         }
 
@@ -50,13 +51,13 @@ def index_pdf(file: UploadFile) -> dict:
 
         print(f"[pdf_service] Generando embeddings para {len(chunks)} chunks...")
         embeddings = embed_texts([c.text for c in chunks])
-        saved = add_chunks(collection_name, chunks, embeddings)
+        saved = add_chunks(source, source_name, chunks, embeddings)
     finally:
         tmp_path.unlink(missing_ok=True)
 
     return {
         "status": "indexed",
-        "collection": collection_name,
+        "collection": source,
         "total_pages": len(pages),
         "pages_skipped": len(skipped),
         "chunks_indexed": saved,

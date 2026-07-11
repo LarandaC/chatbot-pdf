@@ -16,7 +16,9 @@ def get_client() -> Groq:
 def build_propmt(question: str, chunks: list[dict]) -> str:
     context_parts= []
     for i, chunk in enumerate (chunks, start=1):
-        context_parts.append(f"[{i}] (página {chunk['page']}):\n{chunk['text']}")
+        source_name = chunk.get("source_name")
+        label = f"{source_name}, página {chunk['page']}" if source_name else f"página {chunk['page']}"
+        context_parts.append(f"[{i}] ({label}):\n{chunk['text']}")
     
     context = "\n\n".join(context_parts)
     

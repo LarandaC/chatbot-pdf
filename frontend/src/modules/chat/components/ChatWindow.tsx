@@ -75,7 +75,11 @@ export function ChatWindow({ chat, onMessagesChange }: Props) {
             onChange={setInput}
             onSend={handleSend}
             disabled={isPending}
-            placeholder={`Preguntá sobre "${chat.pdfName}"...`}
+            placeholder={
+              chat.pdfCollection === null
+                ? "Preguntá sobre tus documentos..."
+                : `Preguntá sobre "${chat.pdfName}"...`
+            }
           />
         </div>
       </div>

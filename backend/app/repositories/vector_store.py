@@ -3,10 +3,10 @@ from chromadb.config import Settings as ChromaSettings
 
 from app.core.config import get_settings
 
-_client: chromadb.PersistentClient | None = None
+_client: chromadb.api.ClientAPI | None = None
 
 
-def get_client() -> chromadb.PersistentClient:
+def get_client() -> chromadb.api.ClientAPI:
     global _client
     if _client is None:
         settings = get_settings()
@@ -17,29 +17,30 @@ def get_client() -> chromadb.PersistentClient:
     return _client
 
 
-def get_or_create_collection(name: str) -> chromadb.Collection:
+def _get_collection() -> chromadb.Collection:
     """
-    Obtiene una colección existente o la crea si no existe.
-    Cada PDF va a tener su propia colección, identificada por
-    un nombre derivado del filename.
+    Todos los documentos comparten una única colección de Chroma, distinguidos
+    por el campo "source" en la metadata. Esto habilita buscar en todos los
+    PDFs a la vez sin tener que lanzar una query por colección.
     """
     client = get_client()
+    name = get_settings().chroma_collection
     return client.get_or_create_collection(
         name=name,
         metadata={"hnsw:space": "cosine"},  # distancia coseno, consistente con la normalización
     )
 
 
-def add_chunks(collection_name: str, chunks, embeddings: list[list[float]]) -> int:
+def add_chunks(source: str, source_name: str, chunks, embeddings: list[list[float]]) -> int:
     """
-    Guarda los chunks con sus embeddings y metadata en ChromaDB.
+    Guarda los chunks de un documento con sus embeddings y metadata en ChromaDB.
     Devuelve la cantidad de chunks guardados.
     """
-    collection = get_or_create_collection(collection_name)
+    collection = _get_collection()
 
-    # ChromaDB requiere IDs únicos por documento dentro de una colección.
-    # Usamos página + chunk_index para garantizar unicidad y trazabilidad.
-    ids = [f"p{c.page_number}_c{c.chunk_index}" for c in chunks]
+    # Los IDs deben ser únicos en toda la colección compartida, no solo dentro
+    # de un documento, por eso llevan el "source" como prefijo.
+    ids = [f"{source}_p{c.page_number}_c{c.chunk_index}" for c in chunks]
 
     collection.add(
         ids=ids,
@@ -47,6 +48,8 @@ def add_chunks(collection_name: str, chunks, embeddings: list[list[float]]) -> i
         embeddings=embeddings,
         metadatas=[
             {
+                "source": source,
+                "source_name": source_name,
                 "page": c.page_number,
                 "chunk_index": c.chunk_index,
                 "word_count": len(c.text.split()),
@@ -58,30 +61,62 @@ def add_chunks(collection_name: str, chunks, embeddings: list[list[float]]) -> i
 
 
 def search(
-    collection_name: str,
     query_embedding: list[float],
     n_results: int = 3,
+    source: str | None = None,
 ) -> dict:
     """
     Busca los n_results chunks más similares al query_embedding.
+    Si se pasa "source", restringe la búsqueda a ese documento; si no,
+    busca en todos los documentos indexados.
     Devuelve el resultado crudo de ChromaDB.
     """
-    collection = get_or_create_collection(collection_name)
+    collection = _get_collection()
     return collection.query(
         query_embeddings=[query_embedding],
         n_results=n_results,
+        where={"source": source} if source else None,
         include=["documents", "metadatas", "distances"],
     )
 
 
-def collection_exists_and_has_data(collection_name: str) -> bool:
+def document_exists(source: str) -> bool:
     """
-    Chequea si ya indexamos este PDF antes.
+    Chequea si ya indexamos este documento antes.
     Útil para no re-indexar si el archivo ya fue procesado.
     """
     try:
-        client = get_client()
-        collection = client.get_collection(name=collection_name)
-        return collection.count() > 0
+        collection = _get_collection()
+        result = collection.get(where={"source": source}, limit=1, include=[])
+        return len(result["ids"]) > 0
     except Exception:
         return False
+
+
+def list_documents() -> list[dict]:
+    """
+    Lista los documentos indexados con su cantidad de páginas y chunks,
+    agrupando la metadata de todos los chunks por "source".
+    """
+    collection = _get_collection()
+    result = collection.get(include=["metadatas"])
+
+    by_source: dict[str, dict] = {}
+    for meta in result["metadatas"]:
+        source = meta["source"]
+        entry = by_source.setdefault(
+            source,
+            {"source": source, "source_name": meta["source_name"], "pages": set(), "chunks": 0},
+        )
+        entry["pages"].add(meta["page"])
+        entry["chunks"] += 1
+
+    return [
+        {
+            "source": entry["source"],
+            "source_name": entry["source_name"],
+            "pages": len(entry["pages"]),
+            "chunks": entry["chunks"],
+        }
+        for entry in by_source.values()
+    ]

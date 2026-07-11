@@ -13,3 +13,14 @@ export interface UploadResponse {
   chunks_indexed?: number;
   message?: string;
 }
+
+export interface DocumentEntry {
+  source: string;
+  source_name: string;
+  pages: number;
+  chunks: number;
+}
+
+export interface DocumentsResponse {
+  documents: DocumentEntry[];
+}

@@ -1,10 +1,12 @@
 "use client"
+import { useEffect } from "react"
 import { useLocalStorage } from "@/src/hooks/use-local-storage"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { AiChat01Icon } from "@hugeicons/core-free-icons"
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
 import { Empty, EmptyHeader, EmptyTitle, EmptyDescription, EmptyMedia } from "@/components/ui/empty"
 import { PdfEntry } from "../modules/pdf/types/pdf.types"
+import { listDocuments } from "../modules/pdf/services/pdf.service"
 import { Chat, Message } from "../modules/chat/types/chat.types"
 import { PdfSidebar } from "../modules/pdf/components/PdfSidebar"
 import { ChatWindow } from "../modules/chat/components/ChatWindow"
@@ -15,6 +17,23 @@ export default function Home() {
   const [activeChatId, setActiveChatId] = useLocalStorage<string | null>("chat-pdf:active-chat", null)
 
   const activeChat = chats.find((c) => c.id === activeChatId) ?? null
+
+  // Hidrata la biblioteca desde el backend: los documentos ya indexados
+  // sobreviven aunque se limpie el localStorage o se cambie de navegador.
+  useEffect(() => {
+    listDocuments()
+      .then(({ documents }) => {
+        setPdfs((prev) => {
+          const known = new Set(prev.map((p) => p.collection))
+          const missing = documents
+            .filter((d) => !known.has(d.source))
+            .map((d) => ({ name: d.source_name.replace(/\.pdf$/i, ""), collection: d.source, pages: d.pages, chunksIndexed: d.chunks }))
+          return missing.length > 0 ? [...prev, ...missing] : prev
+        })
+      })
+      .catch(() => {})
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   function handleUploaded(entry: PdfEntry) {
     setPdfs((prev) => {
@@ -28,6 +47,19 @@ export default function Home() {
       id: crypto.randomUUID(),
       pdfCollection: pdf.collection,
       pdfName: pdf.name,
+      title: "",
+      messages: [],
+      createdAt: new Date().toISOString(),
+    }
+    setChats((prev) => [newChat, ...prev])
+    setActiveChatId(newChat.id)
+  }
+
+  function createAllDocsChat() {
+    const newChat: Chat = {
+      id: crypto.randomUUID(),
+      pdfCollection: null,
+      pdfName: "Todos los documentos",
       title: "",
       messages: [],
       createdAt: new Date().toISOString(),
@@ -63,6 +95,7 @@ export default function Home() {
         activeChatId={activeChatId}
         onNewConversation={() => setActiveChatId(null)}
         onNewChat={createChat}
+        onNewAllDocsChat={createAllDocsChat}
         onSelectChat={(chat) => setActiveChatId(chat.id)}
         onDeleteChat={handleDeleteChat}
         onUploaded={handleUploaded}
