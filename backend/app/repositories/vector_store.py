@@ -93,6 +93,14 @@ def document_exists(source: str) -> bool:
         return False
 
 
+def delete_document(source: str) -> None:
+    """
+    Elimina todos los chunks de un documento de la colección compartida.
+    """
+    collection = _get_collection()
+    collection.delete(where={"source": source})
+
+
 def list_documents() -> list[dict]:
     """
     Lista los documentos indexados con su cantidad de páginas y chunks,
