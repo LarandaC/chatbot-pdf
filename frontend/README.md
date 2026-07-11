@@ -1,36 +1,56 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PDF Metaheurísticas
 
-## Getting Started
+Proyecto personal desarrollado para agilizar la búsqueda y consulta de información en archivos PDF relacionados con mi trabajo de grado.
 
-First, run the development server:
+## ¿Qué hace?
+
+Permite subir documentos PDF y hacerles preguntas en lenguaje natural. El sistema extrae el texto, lo indexa mediante embeddings semánticos y usa un modelo de lenguaje (LLM) para responder con citas de las páginas fuente.
+
+## Stack
+
+**Backend**
+- FastAPI (Python)
+- ChromaDB — base de datos vectorial local
+- Sentence Transformers — embeddings multilingües (`paraphrase-multilingual-MiniLM-L12-v2`)
+- Groq API — inferencia LLM (`llama-3.3-70b-versatile`)
+
+**Frontend**
+- Next.js 16 + TypeScript
+- Tailwind CSS + shadcn/ui
+- TanStack Query
+
+## Cómo correr el proyecto
+
+**Backend**
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cd backend
+python -m venv venv
+venv\Scripts\activate       # Windows
+pip install -r requirements.txt
+uvicorn main:app --reload
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Disponible en `http://localhost:8000` · Docs en `http://localhost:8000/docs`
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+**Frontend**
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-## Learn More
+Disponible en `http://localhost:3000`
 
-To learn more about Next.js, take a look at the following resources:
+## Variables de entorno
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+`backend/.env`
+```
+GROQ_API_KEY=tu_api_key
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+`frontend/.env.local`
+```
+NEXT_PUBLIC_API_URL=http://localhost:8000
+```
